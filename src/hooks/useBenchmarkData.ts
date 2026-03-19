@@ -204,13 +204,9 @@ export function useBenchmarkData(): BenchmarkDataResult {
           valueScore: 0, // placeholder, assigned below
         }));
 
-        // 4. Sort by averageScore descending, assign ranks (1-based)
-        withScores.sort((a, b) => b.averageScore - a.averageScore);
-        const preRanked = withScores.map((r, i) => ({ ...r, rank: i + 1 }));
-
-        // 5. Compute valueScore = 0.6 × averageScore + 0.4 × speedScore
+        // 4. Compute valueScore = 0.6 × averageScore + 0.4 × speedScore
         //    speedScore is the min-max normalized inverse of avg execution time per task.
-        const avgTimes = preRanked.map((r) => {
+        const avgTimes = withScores.map((r) => {
           const taskCount = r.tasks.length;
           return taskCount > 0
             ? (r.efficiency?.total_execution_time_seconds ?? 0) / taskCount
@@ -220,10 +216,14 @@ export function useBenchmarkData(): BenchmarkDataResult {
         const maxTime = Math.max(...avgTimes);
         const timeRange = maxTime - minTime;
 
-        const ranked: RankedReport[] = preRanked.map((r, i) => {
+        const withValueScores = withScores.map((r, i) => {
           const speedScore = timeRange > 0 ? 1 - (avgTimes[i] - minTime) / timeRange : 1;
-          return { ...r, valueScore: 0.6 * r.averageScore + 0.4 * speedScore };
+          return { ...r, valueScore: 0.5 * r.averageScore + 0.5 * speedScore };
         });
+
+        // 5. Sort by valueScore descending, assign ranks (1-based)
+        withValueScores.sort((a, b) => b.valueScore - a.valueScore);
+        const ranked: RankedReport[] = withValueScores.map((r, i) => ({ ...r, rank: i + 1 }));
 
         // 6. Compute aggregated data
         const catData = buildCategoryData(ranked);

@@ -182,7 +182,7 @@ function LeaderboardRow({ report, isExpanded, onToggle }: RowProps) {
         onClick={onToggle}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onToggle()}
         className="grid cursor-pointer select-none transition-colors duration-150 hover:bg-slate-800/50 focus:outline-none focus:bg-slate-800/50"
-        style={{ gridTemplateColumns: '72px 1fr 190px 130px 80px 100px 110px 32px' }}
+        style={{ gridTemplateColumns: '72px 1fr 130px 190px 80px 100px 110px 32px' }}
       >
         {/* Rank */}
         <div className="flex items-center justify-center px-3 py-4">
@@ -195,6 +195,23 @@ function LeaderboardRow({ report, isExpanded, onToggle }: RowProps) {
           <span className="text-slate-500 text-xs font-mono mt-0.5">{runIdShort}…</span>
         </div>
 
+        {/* Value Score */}
+        <div className="flex flex-col justify-center px-4 py-4 gap-1.5">
+          <span
+            className="text-sm font-bold tabular-nums"
+            style={{ color: '#a78bfa' }}
+            title="价值分 = 0.5 × 得分 + 0.5 × 速度分（速度分为平均任务耗时的归一化倒数）"
+          >
+            {formatScore(report.valueScore)}
+          </span>
+          <div className="w-full h-1.5 rounded-full bg-slate-700/60 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(report.valueScore * 100, 100)}%`, background: '#a78bfa' }}
+            />
+          </div>
+        </div>
+
         {/* Score */}
         <div className="flex flex-col justify-center px-4 py-4 gap-1.5">
           <span className="text-sm font-bold" style={{ color: scoreColor }}>
@@ -204,23 +221,6 @@ function LeaderboardRow({ report, isExpanded, onToggle }: RowProps) {
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{ width: `${Math.min(score * 100, 100)}%`, background: scoreColor }}
-            />
-          </div>
-        </div>
-
-        {/* Value Score */}
-        <div className="flex flex-col justify-center px-4 py-4 gap-1.5">
-          <span
-            className="text-sm font-bold tabular-nums"
-            style={{ color: '#a78bfa' }}
-            title="价值分 = 0.6 × 得分 + 0.4 × 速度分（速度分为平均任务耗时的归一化倒数）"
-          >
-            {formatScore(report.valueScore)}
-          </span>
-          <div className="w-full h-1.5 rounded-full bg-slate-700/60 overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(report.valueScore * 100, 100)}%`, background: '#a78bfa' }}
             />
           </div>
         </div>
@@ -378,14 +378,14 @@ export default function LeaderboardPage() {
           {/* Table header */}
           <div
             className="grid text-xs uppercase tracking-wider text-slate-500 font-semibold border-b border-slate-700/50 bg-slate-900/50"
-            style={{ gridTemplateColumns: '72px 1fr 190px 130px 80px 100px 110px 32px' }}
+            style={{ gridTemplateColumns: '72px 1fr 130px 190px 80px 100px 110px 32px' }}
           >
             <div className="flex items-center justify-center px-3 py-3">Rank</div>
             <div className="flex items-center px-4 py-3">Model</div>
-            <div className="flex items-center px-4 py-3">Score</div>
-            <div className="flex items-center px-4 py-3" style={{ color: '#a78bfa' }} title="价值分 = 0.6 × 得分 + 0.4 × 速度分">
+            <div className="flex items-center px-4 py-3" style={{ color: '#a78bfa' }} title="价值分 = 0.5 × 得分 + 0.5 × 速度分">
               Value
             </div>
+            <div className="flex items-center px-4 py-3">Score</div>
             <div className="flex items-center justify-center px-4 py-3">Tasks</div>
             <div className="flex items-center justify-center px-4 py-3">Pass Rate</div>
             <div className="flex items-center justify-center px-4 py-3">Exec Time</div>
